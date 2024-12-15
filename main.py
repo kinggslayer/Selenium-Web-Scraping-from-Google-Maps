@@ -11,16 +11,20 @@ service = Service("chromedriver.exe")
 option = webdriver.ChromeOptions()
 option.add_argument("start-maximized")
 driver = webdriver.Chrome(service=service,options=option)
-# driver.get("https://www.google.com")
-l=[580011, 580007, 580114, 581105, 581204, 801112, 803118, 496551, 496665, 496116, 496111, 496450, 360020]
-pincode=[]
-a=[]
-addr=[]
-n=[]
+
+# some pincode for example we have taken in list
+list_of_pincodes =[580011, 580007, 580114, 581105, 581204, 801112, 803118, 496551, 496665, 496116, 496111, 496450, 360020]
+
+# intialized lists to store data
+pincode_from_list=[]
+pincode_from_address=[]
+address=[]
+name=[]
 website=[]
-ph=[]
+phone_number=[]
 count=0
-def web():
+# made functions for each required entries
+def get_website():
      try:
           ad=driver.find_element(By.CLASS_NAME,"n1obkb")
           add=ad.get_attribute('href')
@@ -28,32 +32,34 @@ def web():
           website.append(text)
      except:
           website.append(" ")
-def phone():
+def get_phone():
      try:
           ad=driver.find_element(By.CSS_SELECTOR,"[data-dtype='d3ph']")
           text=ad.text
-          ph.append(text)
+          phone_number.append(text)
      except:
-          ph.append(" ")
-def name() :
+          phone_number.append(" ")
+def get_name() :
         try:
             add=driver.find_element(By.CSS_SELECTOR,"[data-attrid='title']")
             text=add.text
-            n.append(text)
+            name.append(text)
         except:
-            n.append(" ")
-def address()   :
+            name.append(" ")
+def get_address()   :
         try:
             add=driver.find_element(By.CLASS_NAME,"LrzXr")
             text=add.text
-            addr.append(text)
+            address.append(text)
             length=len(text)
             text=text[length-6:]
-            a.append(text)
+            pincode_from_address.append(text)
         except:
-            a.append(i)
-            addr.append(" ")
-for i in l:
+            pincode_from_address.append(i)
+            address.append(" ")
+
+# for each pincode in list 
+for i in list_of_pincodes:
     def searchplace(count) :
                     try:
                         driver.get("https://www.google.com/search?sca_esv=00e485a4403845c8&sca_upv=1&rlz=1C1CHWL_enIN1089IN1089&tbs=lf:1,lf_ui:2&tbm=lcl&sxsrf=ADLYWILtKagE78nPZDbQH8192XU34_p3MQ:1716484346537&q=dairies+at+"+str(i)+"+in+india")
@@ -66,8 +72,6 @@ for i in l:
                             sleep(5)
                     except:
                         return
-                    # if(count%10==0):
-                    #       sleep(10)
     searchplace(count)
     count+=1
     try:
@@ -77,6 +81,7 @@ for i in l:
     except:
          pass
     try:
+        # iterating in each page for each query of pincode
          pages=driver.find_elements(By.CSS_SELECTOR,"a.fl")
          for button in pages:
             try:
@@ -84,11 +89,11 @@ for i in l:
                 for k in scroll :
                     k.click()
                     sleep(2)
-                    name()
-                    address()
-                    web()
-                    phone()
-                    pincode.append(i)
+                    get_name()
+                    get_address()
+                    get_website()
+                    get_phone()
+                    pincode_from_list.append(i)
                 button.click()
 
             except:
@@ -100,22 +105,22 @@ for i in l:
                 for k in scroll :
                     k.click()
                     sleep(0.75)
-                    name()
-                    address()
-                    web()
-                    phone()
-                    pincode.append(i)
+                    get_name()
+                    get_address()
+                    get_website()
+                    get_phone()
+                    pincode_from_list.append(i)
                 button.click()
          except:
             pass
 driver.quit()
-list_zip=list(zip(n,addr,a,website,ph,pincode))
+
+# zip all data
+list_zip=list(zip(name,address,pincode_from_address,website,phone_number,pincode_from_list))
 df=pd.DataFrame(list_zip, columns=['Name',"address",'pincode','website','phone number','scrap'])
+
+# give name to data file
 file='india_dairy5.csv'
+
+# make csv file
 df.to_csv(file,encoding="utf-8")
-# print(df)
-# print(n)
-# print(addr)
-# print(a)
-# print(ph)
-# print(website)
